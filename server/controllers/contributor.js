@@ -32,7 +32,8 @@ export async function addContributorToProject(req, res) {
         Contributor_role: role,
 
       });
-      console.log('User is already a contributor to the project');
+      //console.log('User is already a contributor to the project');
+      return res.status(409).send({ message: 'User is already a contributor to the project' });
     } else {
       // Create a new contributor for the user and add them to the project's list of contributors
       const newContributor = new contributor({
@@ -99,35 +100,48 @@ export async function addProject(req, res) {
 
 //////////////////////////////////////////////////////////
 
-export async function DeleteContributor(req, res) {
-  const projectId = req.params._id1;
-  const contributorId = req.params._id2;
-  const deleterContributorId = req.params._id3;
-  // Get the project
-  const Project = await project.findById(projectId);
-
-  // Get the contributor who is deleting and check if they are a maintainer
-  const deleterContributor = await contributor.findById(deleterContributorId);
-  const isDeleterMaintainer = deleterContributor.role === 'Maintainer';
-
-  // If the deleter is not a maintainer, throw an error
-  if (!isDeleterMaintainer) {
-    throw new Error('Only Maintainers can remove contributors from a project');
+export async function DeleteContributorFromProject(req, res) {
+  const userID = req.params.user;
+  const contrubutortoDelete1 = req.body.contributor;
+  const projectName = req.body.project;
+  const contributor = await contributor.findOne({ user: userID});
+  if (!contributor || contributor.role !== "Maintainer") {
+    return { success: false, message: "You are not authorized to perform this action." };
   }
 
-  // Get the contributor to be deleted
-  const Contributor = await contributor.findById(contributorId);
+  const project = await project.findOne({ name: projectName });
+  if (!project) {
+    return { success: false, message: "Project not found." };
+  }
 
-  // Remove the contributor from the project
-  await contributor.findByIdAndDelete(contributorId);
+const contributorToDelete2 = await project.findOne({ contributors: contrubutortoDelete1.user.userName });
 
-  // Remove the project reference from the contributor
-  await contributor.findByIdAndUpdate(contributorId, {
-    $pull: { projects: projectId },
-  });
+project.contributors.pull(contributorToDelete2._id);
+contributorToDelete2.projects.pull(project._id);
 
-  // Remove the contributor reference from the project
-  await project.findByIdAndUpdate(projectId, {
-    $pull: { contributors: contributorId },
-  });
+// Save the changes to the project and the contributor.
+await project.save();
+await contributorToDelete2.save();
+
+// Return a success message.
+return { success: true, message: "Contributor deleted successfully." };
+};
+
+
+//////////////////////////////////////////////////////////////////
+export  async function getContributorRoleByUerID(req, res)  {
+  try {
+    const user = req.params.user;
+    const foundContributor = await contributor.findOne({user:user});
+    if (foundContributor) {
+      const role = foundContributor.role;
+      console.log(role);
+      return res.json({ ContributorRole:  role });
+    } else {
+      res.status(404).json({ message: 'Contributor not found' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };

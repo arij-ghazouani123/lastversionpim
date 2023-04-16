@@ -20,6 +20,7 @@ import { FormatAlignCenter } from '@material-ui/icons';
 import React from 'react';
 import CryptoJS from 'crypto-js';
 import { Octokit } from '@octokit/core';
+import GitHubAuth from './GitHubAuth';
 
 function RepositorySelect(props) {
 
@@ -42,6 +43,7 @@ function RepositorySelect(props) {
   const [selectedOS, setSelectedOS] = useState("");
   const [IsSgined, setIsSgined] = useState("");
   const [IsDistributed, setIsDistributed] = useState("");
+  
 
 
   const [selectedBuildVariant, setSelectedBuildVariant] = useState("");
@@ -66,8 +68,17 @@ function RepositorySelect(props) {
   const [AndroidfileContents, setAndroidFileContents] = useState('');
   const [Flutter_AndroidfileContents, setFlutter_AndroidfileContents] = useState('');
   const [Flutter_IosfileContents, setFlutter_IosfileContents] = useState('');
-  const token = "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";
 
+  const [accessToken, setAccessToken] = useState(null);
+
+  //const token ="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"
+  
+  const token ="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"
+  
+
+  const handleTokenChange = (token) => {
+    setAccessToken(token);
+  };
 
   const handleSigningKeyChange = (event) => {
     const file = event.target.files[0];
@@ -211,16 +222,15 @@ function RepositorySelect(props) {
 
                       // Create a new FormData object to send the build data and file together
                       const formData = new FormData();
-                      formData.append("name_build", selectedBranch.name);
-                      formData.append("Bundel", isAppBundle);
+                      formData.append("Notes", selectedBranch.name);
+                      formData.append("Version", isAppBundle);
                       formData.append("status", "success");
-                      formData.append("buildvariant_config", "release");
-                      formData.append("isincrementversioncode_config", isIncrementVersionCode);
-                      formData.append("buildvariant", "release");
-                      formData.append("lastbuild", new Date().toISOString());
-                      formData.append("app_apk", apkFile);
+                      formData.append("Testeur", "release");
+                      formData.append("Date", new Date().toISOString());
+                      formData.append("lien", "release");
+                      formData.append("apkFile", apkFile);
 
-                      axios.post("http://localhost:9090/addBuild", formData);
+                      axios.post("http://localhost:9090/api/release", formData);
 
 
 
@@ -310,7 +320,7 @@ function RepositorySelect(props) {
   }
 
 
-  async function createDirectory(accessToken, owner, repo, directoryPath) {
+  async function createDirectory(token, owner, repo, directoryPath) {
     try {
 
 
@@ -712,8 +722,12 @@ function RepositorySelect(props) {
                     <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjkwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDI5MCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRpdGxlPmNvbm5lY3Qtc2VydmljZS1pbGx1c3RyYXRpb248L3RpdGxlPjxnIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik0yODEuNjUgMTY4LjRoLTM3Ljg3Yy0zLjkyIDAtNi44OCAzLjE4LTYuODggNi45MyAwIDMuOTQgMi45NiA2Ljk1IDYuODggNi45NWgzNy44N2MzLjkgMCA2Ljg2LTMgNi44Ni02Ljk1IDAtMy43NS0yLjktNi45My02LjgtNi45M3oiIGZpbGw9IiNFQkVCRUIiLz48cGF0aCBkPSJNMTU2LjMgMTZjNC40NSAwIDcuNiAzIDcuNiA3LjY4IDAgNC41LTMuMTUgNy41LTcuNiA3LjUtNC40NyAwLTcuNjItMy03LjYyLTcuNSAwLTQuNjggMy4xNS03LjY4IDcuNjItNy42OHptMCAxMi45NGMyLjk2IDAgNS0yLjI0IDUtNS40NSAwLTIuOS0yLjA0LTUuMS01LTUuMS0zIDAtNC44NCAyLjItNC44NCA1IDAgMy4yIDEuODUgNS40MiA0Ljg0IDUuNDJ6bTEwIDEuODdWMTYuNGgyLjZ2MTQuNGgtMi42ek0xNzguNzUgMTZjNC40NiAwIDcuNjIgMyA3LjYyIDcuNjggMCA0LjUtMy4xNiA3LjUtNy42MiA3LjUtNC40NSAwLTcuNi0zLTcuNi03LjUgMC00LjY4IDMuMTUtNy42OCA3LjYtNy42OHptMCAxMi45NGMyLjk4IDAgNS4wMi0yLjI0IDUuMDItNS40NSAwLTIuOS0yLjA0LTUuMS01LjAyLTUuMS0yLjk3IDAtNC44MiAyLjItNC44MiA1IDAgMy4yIDEuODUgNS40MiA0LjgyIDUuNDJ6TTE5NS42NSAxNmM0LjQ1IDAgNy42IDMgNy42IDcuNjggMCA0LjUtMy4xNSA3LjUtNy42IDcuNS00LjQ3IDAtNy42Mi0zLTcuNjItNy41IDAtNC42OCAzLjE1LTcuNjggNy42Mi03LjY4em0wIDEyLjk0YzIuOTcgMCA0LjgyLTIuMjQgNC44Mi01LjQ1IDAtMi45LTEuODUtNS4xLTQuODItNS4xLTMgMC01LjAzIDIuMi01LjAzIDUgMCAzLjIgMi4wNCA1LjQyIDUuMDMgNS40MnptLTQ2LjIzIDI2LjQzVjQwLjkzaDIuNnYxNC40NGgtMi42em01Ljc2IDBWNDAuOTNoMi40djE0LjQ0aC0yLjR6bTEyLjQzLTE0LjhjNC41IDAgNy43IDMgNy43IDcuNXMtMy4xMiA3LjUtNy42IDcuNjhjLTQuNDIgMC03LjYtMy03LjYtNy41IDAtNC42OCAzLjE4LTcuNyA3LjYtNy43em0wIDEyLjkzYzMgMCA0LjktMi40NCA0LjktNS40NCAwLTIuOC0xLjgtNS4yNC00LjgtNS4yNC0yLjk0IDAtNSAyLjQzLTUgNS4yNCAwIDMgMi4wNiA1LjQ0IDUgNS40NHptOS45IDEuODdWNDAuOTNoMi42djE0LjQ0aC0yLjZ6bTUuOCAwVjQwLjkzaDIuNHYxNC40NGgtMi40em0xMi40Ny0xNC44YzQuNDUgMCA3LjYgMyA3LjYgNy41cy0zLjE1IDcuNS03LjYgNy42OGMtNC40NyAwLTcuNjItMy03LjYyLTcuNSAwLTQuNjggMy4xNi03LjcgNy42My03Ljd6bTAgMTIuOTNjMi45NyAwIDUtMi40NCA1LTUuNDQgMC0yLjgtMi4wMy01LjI0LTUtNS4yNC0zIDAtNC44NCAyLjQzLTQuODQgNS4yNCAwIDMgMS44NiA1LjQ0IDQuODUgNS40NHoiIGZpbGw9IiM5RTlFOUUiLz48cGF0aCBkPSJNMTAzLjczIDE2OC40SDcuOTNjLTMuNyAwLTYuODggMy4xOC02Ljg4IDYuOTMgMCAzLjk0IDMuMTcgNi45NSA2Ljg3IDYuOTVoOTUuOGMzLjcyIDAgNi44Ny0zIDYuODctNi45NSAwLTMuNzUtMy4yLTYuOTMtNi45LTYuOTN6IiBmaWxsPSIjRUJFQkVCIi8+PHBhdGggZD0iTTI0Ni43NiAxNzUuODN2LTNsNy02di01OWg5djY0bDUtNXYtNTloMTB2NjhoLTMxek0xMTMuOTMgMTA5LjljLS45MyAwLTEuNjctLjItMi42LS4zOC04LjM0LTEuMy0xMi4yNS05LjE4LTEyLjI1LTkuNTVsMy45LTEuOSA0LjEtMS44NnMyLjAzIDQgNS43NCA0LjZjMy45Ljc3IDguOTItMi4xIDE0LjY2LTcuOWw2LjMyIDYuNGMtNy4wNiA3LjEtMTMuNTUgMTAuNy0xOS44NyAxMC43ek03NC44OCA4NHY3OWw5IDl2M2gtMjJWODRoMTN6bS0yNi4xIDB2NzlsOSA5djNoLTIyVjg0aDEzem0xODYuNjQgMjUuOWMtNi4xNCAwLTEyLjgtMy41Ni0xOS43LTEwLjY4bDYuMzMtNi40YzUuNzUgNS44MiAxMC43NyA4LjY0IDE0LjY3IDcuOSAzLjctLjU3IDUuNzYtNC41IDUuNzYtNC41bDguMjUgMy42Yy0uNDYuNTItNC4xNyA4LjQtMTIuNTMgOS43LS45My4yLTEuODUuMzgtMi43OC4zOHoiIGZpbGw9IiMwMDFGNTIiLz48cGF0aCBkPSJNMTAyLjEzIDQxLjV2NzQuNTVzMCA1LjI4LTUuMiA1LjI4SDUuMjNjLS4wNCAwLTUuMjQgMC01LjI0LTUuMjhWNDEuNWMwLS4wMiAwLTUuMjggNS4yLTUuMjhoOTEuN2MtLjIgMCA1LjIgMCA1LjIgNS4yN3ptMTQyLjQgMGMwLTUuMjggNS4xNi01LjI4IDUuMi01LjI4aDM1LjA1YzUuMjIgMCA1LjIyIDUuMjcgNS4yMiA1LjI3VjExNmMwIDUuMjgtNS4xOCA1LjI4LTUuMjIgNS4yOGgtMzUuMDRjLTUuMjIgMC01LjIyLTUuMjYtNS4yMi01LjI3VjQxLjV6IiBmaWxsPSIjNjYyNTdDIi8+PHBhdGggZD0iTTEzNy4xNCA5Ni4ybC0zLjM0IDMuNC02LjctNi40IDMuMzYtMy41NS4yLS4yYzEuODQtMS44NyA0LjYzLTEuODcgNi40OCAwIDEuODUgMS43IDEuODUgNC43IDAgNi41NnYuMnptLTI4LjQtNTQuOTh2NzVjLjEtLjE2LjEgNS4xLTUgNS05NC42My4xLTk0LjYzLjEtOTUgMCAuMzcuMS01IC4xLTUtNXYtNzVjMCAuMjYgMC01IDUtNWg5NWMtLjEgMCA1LjEgMCA1IDV6bTEzMi44IDBjMC01IDUuNDQtNSA1LTVoMzZjNS4yMiAwIDUuMjIgNS4yNyA1IDUgLjIyLjI3LjIyLjI3IDAgNzUgLjIyIDUuMS01LjIgNS4xLTUgNS0uMi4xLS4yLjEtMzYgMC01IC4xLTUtNS4xNi01LTV2LTc1em0tMjkuMTQgNTVsLS4yLS4yYy0xLjg0LTEuODgtMS42NS00Ljg4IDAtNi41NiAxLjg3LTEuODggNC44NC0xLjg4IDYuNyAwdi4ybDMuNTMgMy41NC02LjcgNi40LTMuMzMtMy40eiIgZmlsbD0iIzk5NTE5OCIvPjxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik05IDEwNGg5NVY0MUg5Ii8+PHBhdGggZD0iTTYzLjU3IDU4TDcxIDYxdjI0bC03LjUgMy0xMS45My0xMS44NEw0NCA4MmwtMy0xLjQ4VjY1LjQ4bDMtMS40MyA3LjU3IDUuOTIgMTItMTEuOTd6TTQ0IDY4LjU0djkuMTJsNC41LTQuNjMtNC41LTQuNXptMTEuNzMgNC41bDcuNzcgNi4xMlY2Ni45bC03Ljc3IDYuMTN6IiBmaWxsPSIjRkZGIi8+PHBhdGggZD0iTTMuODUgMTE2LjF2LjE4YzAgMy4zNyAyLjA0IDQuNSAzLjUyIDUuMDVIOTYuNSA5LjIzcy01LjIgMC01LjM4LTUuMjR6IiBmaWxsPSIjNjEyMzc2Ii8+PHBhdGggZmlsbD0iI0ZGRiIgZD0iTTI0NyAxMDVoMzVWNDFoLTM1Ii8+PHBhdGggZmlsbD0iI0Y1RjVGNSIgZD0iTTI0NyA2M3Y0MmgzNVY4NCIvPjxwYXRoIGQ9Ik0yMDkgODMuNzNjNC40Mi42IDcuODQgNC40NyA3Ljg0IDkuMSAwIDQuNDctMy40MiA4LjMtNy44NSA4LjkydjMuM2MwIDEuOS0yLjEgMS45LTEuOSAxLjloLTE3LjZjLTEuOSAwLTEuOS0yLjA2LTEuOS0xLjl2LTI0LjFjMC0xLjkgMi0xLjkgMS45LTEuOWgxNy42YzEuOCAwIDEuOCAyLjA3IDEuOCAxLjl2Mi43OHptMCA0Ljc1djguN2MxLjk3LS41NCAzLjM2LTIuMzIgMy4yLTQuMzUuMTYtMi4yLTEuMjMtMy44Ni0zLjItNC4zNXptLTY4LjQ1IDEzLjI3Yy00LjQzLS42LTcuODUtNC40NS03Ljg1LTguOTIgMC00LjYzIDMuNDItOC41IDcuODUtOS4xdi0yLjc4YzAgLjE3IDAtMS45IDEuODgtMS45aDE3LjZjLS4xNyAwIDEuODcgMCAxLjg3IDEuOXYyNC4xYzAtLjE2IDAgMS45LTEuODggMS45aC0xNy42Yy4xNyAwLTEuODcgMC0xLjg3LTEuOXYtMy4zem0wLTQuNTh2LTguN2MtMS45OC41LTMuMzcgMi4xNy0zLjIyIDQuMzYtLjE1IDIuMDMgMS4yNCAzLjggMy4yMiA0LjM0eiIgZmlsbD0iIzAwNzhENCIvPjxwYXRoIGQ9Ik0xNTkuMzggODIuODZ2LjYzYzAtLjMgMCAxLjktMS44IDEuOWgtMTIuN2MuMTcgMC0xLjgzIDAtMS44My0xLjl2LS43YzAgLjIgMC0xLjkgMS44Mi0xLjloMTIuN2MtLjIgMCAxLjggMCAxLjggMS45em0zMC43NyAwdi42M2MwLS4zIDAgMS45IDEuOCAxLjloMTIuN2MtLjE3IDAgMS44MyAwIDEuODMtMS45di0uN2MwIC4yIDAtMS45LTEuODItMS45aC0xMi43Yy4yIDAtMS44IDAtMS44IDEuOXoiIGZpbGw9IiNGRkYiLz48L2c+PC9zdmc+" alt="GitHub" />
                     <h1 class="my-comp text-center" style={{ color: "white" }}>Connect with GitHub</h1>
                     <p style={{ color: "white" }}>Connect your GitHub account to access your repositories.</p>
-                    <Button variant="primary" onClick={() => setShowModal(true)}>
-                      Connect with GitHub
+                    <Button   style={{ display: window.location.search.includes('code=') ? 'block' : 'none' ,
+                    margin: '0 auto',
+                    textAlign: 'center',
+                    marginTop: '20px'}}
+                    variant="primary" onClick={() => setShowModal(true)}>
+                      Select a Repositorie
                     </Button>
 
                   </>
@@ -1165,8 +1179,8 @@ function RepositorySelect(props) {
                 </Modal>
               </div>
 
-
-
+   <GitHubAuth onTokenChange={handleTokenChange} />
+      {accessToken && <RepositorySelect accessToken={accessToken} />}
 
               <div className="my-comp container-fluid">
               </div>

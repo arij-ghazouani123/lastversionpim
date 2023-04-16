@@ -15,10 +15,12 @@ const Register = () => {
       const res = await axios.post('/register', newUser);
       console.log(res.data);
       localStorage.setItem("email", email);
-      history.push('/login'); // navigate to the next page
+      // navigate to the next page
     } catch (err) {
       console.log(err);
     }
+    history.push('/login');
+
 };
 
   const [errors, setErrors] = useState({});

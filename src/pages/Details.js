@@ -2,7 +2,23 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Redirect, useHistory, useNavigate, useParams } from "react-router-dom";
 import InputGroup from "../components/InputGroupEvent";
+import Modal from "react-modal";
 
+Modal.setAppElement("#root");
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+    width: "800px",
+    height: "600px",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+
+  },
+};
 function Details() {
   const [testeur, setTesteur] = useState([]);
 
@@ -11,6 +27,7 @@ function Details() {
   const navigate = useHistory();
   const [errors, setErrors] = useState({});
   const [users, setUsers] = useState([]);
+  const [modalIsOpenedit, setModalIsOpenedit] = useState(true);
 
   const onChangeHandler = (e) => {
     setForm({
@@ -50,7 +67,7 @@ function Details() {
     axios.put(`/api/release/release/${id}`, form)
       .then((res) => {
         //rederction
-        navigate.push("/Release");
+        navigate.push("/dashboard");
         loadRelease();
       })
       .catch((err) => setErrors(err.response.data));
@@ -76,7 +93,20 @@ function Details() {
 
   return (
     <div className="container mt-4 col-12 col-lg-4">
-      <form onSubmit={onSubmitHandler}>
+     
+
+
+
+
+      <Modal isOpen={modalIsOpenedit} style={customStyles}>
+          <div>
+            <div
+              className="col-12 col-lg-8 "
+              style={{ marginLeft: 140, justifyContent: "center" }}
+            >
+             
+
+             <form onSubmit={onSubmitHandler}>
         <InputGroup
           label="Notes"
           type="text"
@@ -103,11 +133,28 @@ function Details() {
             </option>
           ))}
         </select>
-
+    <div>
         <button className="btn btn-primary" type="submit">
           Update Release
-        </button>
+        </button>   <button
+                    onClick={() => setModalIsOpenedit(false) }
+                    class="btn btn-primary"
+                  >
+                    close{" "}
+                  </button></div>
       </form>
+            
+
+
+
+
+
+
+
+
+            </div>
+          </div>
+        </Modal>
     </div>
   );
 }

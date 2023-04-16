@@ -37,10 +37,10 @@ function QrCode() {
   const fetchData = async () => {
     try {
       const response = await axios.get(`/api/release/${id}`);
-      const testeur = response.data.Notes
-      setUsers( "http://localhost:3001/Android/" +testeur);
-      console.log("ttttttttt", testeur);
-      return testeur;
+      const note = response.data._id
+      setUsers( "http://172.31.128.1:3000/Android/" +note);
+      console.log("ttttttttt", note);
+      return note;
     } catch (error) {
       console.log(error.message);
     }

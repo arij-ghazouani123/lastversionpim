@@ -79,7 +79,7 @@ function App() {
    
     <div >
       {/* <ReactSwitch checked={isDarkMode} onChange/> */}
-      <ReactSwitch/>
+      {/* /<ReactSwitch/> */}
       <Navbar auth={auth1}/>
       <Switch>
         <Route exact path="/" component={Home} />
@@ -87,12 +87,12 @@ function App() {
         <Route exact path="/service" component={Services} />
         <Route exact path="/contact" component={Contact} />
         <Route exact path="/invitation" component={InviteForm} />
-        <Route exact path="/dashboard" component={Dashboard} />
         <Route exact path="/ProjectList" component={ProjectsList} />
       
         <Protectedroute exact path="/payment" component={PaymentForm} auth={auth1}/>
-
         <Protectedroute exact path="/VerificationCode" component={VerificationCode} auth={auth1}/>
+
+        <Protectedroute exact path="/dashboard" component={Dashboard} auth={auth1}/>
         <Protectedroute exact path="/SettingsPage" component={SettingsPage} auth={auth1}/>
         <Protectedroute exact path="/Profile" component={Profile} auth={auth1}/>
         <Protectedroute exact path="/ConnectToStore" component={ConnectToStore} auth={auth} />

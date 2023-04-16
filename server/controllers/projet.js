@@ -90,7 +90,7 @@ export async function afficherDetailsProjet(req, res) {
           const projectId = req.params._id;
           const Project = await project.findById(projectId)
                .populate('user', 'userName')
-               .populate('contributors')
+               .populate({ path: 'contributors', populate: { path: 'user', select: 'userName' }})
                .populate('name')
                .populate('releaseType')
                .populate('opSystem')

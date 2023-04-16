@@ -14,7 +14,7 @@ export default function Afficheprojectmodel(props) {
         <>
         <button type="button" class="btn btn-primary  w-30 rounded-pill" onClick={() => setModalIsOpen(true)} onRequestClose={() => setModalIsOpen(false)}> Details</button>
       <div>
-        <Modal isOpen={modalIsOpen} style={{ width: 500, height: 500 }}>
+      <Modal isOpen={modalIsOpen} style={{ width: 400, height: 400, content: { width: 1200, height: 250 }}}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button onClick={() => setModalIsOpen(false)} > X</button>
 

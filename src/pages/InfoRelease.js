@@ -154,7 +154,7 @@ function Details() {
             </Button>
             <span className="align-middle">
                           <Link to={`/Android/${form._id}`} className="text-black">
-                          http://localhost:3001/Android/{form.Notes}
+                          http://localhost:3000/Android/{form.Notes}
                           </Link>
                         </span>
           </ModalFooter>

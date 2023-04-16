@@ -16,11 +16,16 @@ const InviteForm = () => {
 
   const handleContributorChange =async (event3) => {
     event3.preventDefault();
-    const response7 =  fetch(`/addcontributortoproject/${Project}`, {
+    const response7 = await  fetch(`/addcontributortoproject/${Project}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, role })
       });
+      console.log(response7.status);
+      if (response7.status === 409) {
+        window.alert('this user is already a contributor in the project');
+        history.push('/ProjectList')
+      }
   };
   
 
@@ -49,7 +54,6 @@ const InviteForm = () => {
       });
       localStorage.setItem('EmailFromInvitation', JSON.stringify(email));
       localStorage.setItem('RoleFromInvitation', JSON.stringify(role));
-      history.push('/ProjectList')
     // Logic to send invitation using email, projectName and role
   }
   setErrors(errors);

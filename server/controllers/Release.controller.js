@@ -1,4 +1,4 @@
-import Release from "../models/release.models.js";
+import Release from "../modals/release.models.js";
 import ValidateUser from"../validation/Users.validation.js";
 import contributor from"../modals/contributor.js";
 //import user from"../models/userSchema.js";
@@ -57,7 +57,7 @@ export async function AddReleaseApk (req, res){
 
   try {
     // Find the latest release with the same notes
-    const lastRelease = await Release.findOne({ Notes }).sort({ Version: -1 }).exec();
+    const lastRelease = await Release.findOne({ apkFile: apkFile.originalname }).sort({ Version: -1 }).exec();
 
     // Increment the version number by 0.1
     const newVersion = lastRelease ? parseFloat(lastRelease.Version) + 0.1 : 1.0;
